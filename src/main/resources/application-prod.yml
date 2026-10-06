@@ -1,0 +1,27 @@
+# =============================================
+# CoopConnect — Production Profile (PostgreSQL)
+# NFR-01: All secrets via environment variables
+# =============================================
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/coopconnect}
+    username: ${DATABASE_USERNAME:coopconnect}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  thymeleaf:
+    cache: true
+
+  flyway:
+    locations: classpath:db/migration
+
+logging:
+  level:
+    root: WARN
+    rw.coopconnect: INFO
