@@ -1,0 +1,270 @@
+# ==============================================================================
+# CoopConnect .gitignore
+# Rwanda Farmers' Cooperative & Produce Marketplace
+# ==============================================================================
+
+# ==============================================================================
+# Compiled Class Files & Build Outputs
+# ==============================================================================
+target/
+build/
+out/
+bin/
+dist/
+*.class
+*.war
+*.nar
+*.ear
+*.jar
+!**/wrapper/maven-wrapper.jar
+
+# Compressed archives from manual backups
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# ==============================================================================
+# Build Tools: Maven & Gradle
+# ==============================================================================
+# Maven
+.mvn/timing.properties
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.flattened-pom.xml
+
+# Gradle (in case Gradle wrapper/build is used)
+.gradle/
+gradle/
+gradlew
+gradlew.bat
+
+# ==============================================================================
+# IDEs & Code Editors
+# ==============================================================================
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+cmake-build-*/
+
+# Eclipse & Spring Tool Suite (STS)
+.classpath
+.project
+.settings/
+.factorypath
+.springBeans
+.sts4-cache/
+.apt_generated/
+.apt_generated_tests/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+.history/
+.ionide/
+
+# NetBeans
+nbproject/
+nbproject/private/
+nbbuild/
+nbdist/
+nb-configuration.xml
+.nb-gradle/
+
+# Fleet & Other Editors
+.fleet/
+*.sublime-project
+*.sublime-workspace
+
+# ==============================================================================
+# Operating System Files
+# ==============================================================================
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+Icon\r\r
+
+# Linux
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ==============================================================================
+# Java Virtual Machine (JVM) & Diagnostics
+# ==============================================================================
+hs_err_pid*
+replay_pid*
+*.hprof
+core.*
+*.dump
+
+# ==============================================================================
+# Logs & Diagnostic Outputs
+# ==============================================================================
+logs/
+*.log
+*.log.*
+*.stdout
+*.stderr
+spring.log
+spring-shell.log
+
+# ==============================================================================
+# Spring Boot & Local Environment Overrides
+# ==============================================================================
+application-local.yml
+application-local.yaml
+application-local.properties
+application-*-local.yml
+application-*-local.yaml
+application-*-local.properties
+application-secret.yml
+application-secret.yaml
+application-secret.properties
+bootstrap-local.yml
+bootstrap-local.yaml
+bootstrap-local.properties
+
+# ==============================================================================
+# Database & Persistence Files
+# ==============================================================================
+# H2 Database
+*.mv.db
+*.trace.db
+*.lock.db
+
+# Embedded / Local SQLite & DB files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.sql.gz
+
+# ==============================================================================
+# Secrets, Keys, Certificates & Credentials (NFR-01)
+# ==============================================================================
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.crt
+*.der
+secrets/
+credentials.json
+client_secret*.json
+id_rsa*
+id_ed25519*
+
+# ==============================================================================
+# Application Storage, Uploads & Temporary Directories
+# ==============================================================================
+uploads/*
+!uploads/.gitkeep
+storage/*
+!storage/.gitkeep
+data/*
+!data/.gitkeep
+temp/*
+!temp/.gitkeep
+tmp/*
+!tmp/.gitkeep
+
+# ==============================================================================
+# Testing & Code Coverage
+# ==============================================================================
+jacoco.exec
+*.exec
+test-output/
+surefire-reports/
+failsafe-reports/
+coverage/
+htmlcov/
+.nyc_output/
+.scannerwork/
+.sonar/
+
+# ==============================================================================
+# Annotation Processors & Generated Code
+# ==============================================================================
+generated-sources/
+generated-test-sources/
+lombok.config
+
+# ==============================================================================
+# Containers & Virtualization
+# ==============================================================================
+docker-compose.override.yml
+docker-compose.override.yaml
+.dockerignore.local
+
+# ==============================================================================
+# Node & Frontend Tooling (if frontend assets/scripts are bundled)
+# ==============================================================================
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+.parcel-cache/
+.turbo/
+
+# ==============================================================================
+# Temporary Files, Editor Swaps & Backups
+# ==============================================================================
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+*.temp
+*.orig
+*.rej
+*.patch
+.#*
+\#*\#
+
+# ==============================================================================
+# AI Assistants, Tool Caches & Local Scratchpads
+# ==============================================================================
+.gemini/
+.claude/
+.cursor/
+.continue/
+scratch/
