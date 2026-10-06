@@ -1,0 +1,57 @@
+# =============================================
+# CoopConnect — Shared Configuration
+# =============================================
+spring:
+  application:
+    name: CoopConnect
+
+  # JPA defaults (overridden per profile)
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Thymeleaf
+  thymeleaf:
+    cache: false
+    encoding: UTF-8
+
+  # Servlet / file upload
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+
+  # Messages / i18n
+  messages:
+    basename: messages
+    encoding: UTF-8
+
+  # Flyway
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+# Server
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: 30m
+  error:
+    whitelabel:
+      enabled: false
+
+# File upload directory (NFR-01: configurable, not hardcoded)
+app:
+  upload-dir: ${UPLOAD_DIR:./uploads}
+  base-url: ${APP_BASE_URL:http://localhost:8080}
+
+# Logging
+logging:
+  level:
+    root: INFO
+    rw.coopconnect: DEBUG
+    org.springframework.security: INFO
