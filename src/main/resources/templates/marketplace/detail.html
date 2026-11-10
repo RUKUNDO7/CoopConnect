@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${listing.title}">Produce Details</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container" style="max-width: 1000px; margin-top: 1.5rem;">
+        <a th:href="@{/products}" style="display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 1.5rem; font-weight: 600;">
+            &larr; Back to Catalog
+        </a>
+
+        <div class="card" style="overflow: hidden; box-shadow: var(--shadow-md);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 2rem;">
+                
+                <!-- Produce Media / Visual -->
+                <div style="background-color: #E2E8F0; border-radius: var(--radius-lg); height: 380px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+                    <img th:if="${listing.photoUrl != null && !#strings.isEmpty(listing.photoUrl)}"
+                         th:src="@{${listing.photoUrl}}" th:alt="${listing.title}" style="width: 100%; height: 100%; object-fit: cover;"
+                         onerror="this.onerror=null; this.parentElement.innerHTML='🌱';">
+                    <span th:unless="${listing.photoUrl != null && !#strings.isEmpty(listing.photoUrl)}" style="font-size: 5rem;">🌱</span>
+                    <span class="product-grade-badge" style="font-size: 0.85rem; padding: 0.35rem 0.85rem;" th:text="${listing.harvest.qualityGrade}">GRADE_A</span>
+                </div>
+
+                <!-- Produce Details & Purchasing -->
+                <div style="display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-muted);">
+                        <span>🏢</span>
+                        <span th:text="${listing.cooperative.name}">Cooperative</span>
+                        <span>•</span>
+                        <span th:text="${listing.cooperative.district + ', ' + listing.cooperative.sector}">District</span>
+                    </div>
+
+                    <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.75rem;" th:text="${listing.title}">
+                        Kinigi High-Grade Irish Potatoes
+                    </h1>
+
+                    <div style="background-color: var(--bg-main); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                            <div>
+                                <span style="font-size: 2rem; font-weight: 800; color: var(--primary);"
+                                      th:text="${#numbers.formatDecimal(listing.pricePerUnit, 1, 'COMMA', 0, 'POINT')}">500</span>
+                                <span style="color: var(--text-muted); font-size: 1rem;" th:text="${' ' + listing.currency + ' / ' + listing.unit}"> RWF / kg</span>
+                            </div>
+                            <span class="status-chip status-verified">VERIFIED PRODUCER</span>
+                        </div>
+                        <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                            <span>Available Stock: </span>
+                            <strong th:text="${#numbers.formatDecimal(listing.availableQuantity, 1, 'COMMA', 0, 'POINT') + ' ' + listing.unit}">3,000 kg</strong>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem; font-size: 0.9375rem; color: var(--text-secondary); line-height: 1.7;">
+                        <p><strong>Harvest Origin:</strong> Harvested by certified cooperative farmer <span th:text="${listing.harvest.farmer.fullName}">Jean Baptiste</span> under standard quality inspection guidelines.</p>
+                        <p style="margin-top: 0.5rem;"><strong>Expected Delivery:</strong> Ready for transporter pickup at the cooperative collection center in <span th:text="${listing.cooperative.sector}">Kinigi</span>.</p>
+                    </div>
+
+                    <!-- Add to Cart (FR-06) -->
+                    <div style="margin-top: auto;" sec:authorize="hasRole('BUYER')">
+                        <form th:action="@{/cart/add}" method="post">
+                            <input type="hidden" name="listingId" th:value="${listing.id}">
+                            <div style="display: flex; gap: 0.75rem; align-items: flex-end;">
+                                <div style="flex: 1;">
+                                    <label for="quantity" class="form-label">Order Quantity (<span th:text="${listing.unit}">kg</span>)</label>
+                                    <input type="number" id="quantity" name="quantity" class="form-control"
+                                           value="100" min="1" th:max="${listing.availableQuantity}" step="1" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg" style="flex: 2;">
+                                    🛒 Add to Cart
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div style="margin-top: auto;" sec:authorize="!isAuthenticated()">
+                        <div style="background-color: var(--accent-light); padding: 1rem; border-radius: var(--radius-md); font-size: 0.875rem;">
+                            <strong>Bulk Buyer?</strong> <a th:href="@{/login}">Sign in as a Buyer</a> to place wholesale orders with mobile money checkout.
+                        </div>
+                    </div>
+
+                    <div style="margin-top: auto;" sec:authorize="isAuthenticated() and !hasRole('BUYER')">
+                        <div style="background-color: var(--bg-main); padding: 1rem; border-radius: var(--radius-md); font-size: 0.875rem; color: var(--text-secondary);">
+                            ℹ️ Logged in as <span th:text="${currentUser.role}">FARMER</span>. Only wholesale buyers can place cart orders.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
