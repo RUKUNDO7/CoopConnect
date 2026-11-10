@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Shopping Cart</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container" style="max-width: 900px;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark);">Shopping Cart</h1>
+            <a th:href="@{/products}" style="font-weight: 600;">&larr; Continue Shopping</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(cart.items)}" style="text-align: center; padding: 4rem 1rem; background-color: var(--bg-surface); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+            <span style="font-size: 3.5rem;">🛒</span>
+            <h3 style="margin-top: 1rem; color: var(--text-primary);">Your cart is currently empty</h3>
+            <p style="color: var(--text-muted); margin-top: 0.25rem;">Explore cooperative listings in our marketplace and add bulk produce.</p>
+            <a th:href="@{/products}" class="btn btn-primary" style="margin-top: 1.5rem;">Explore Produce Marketplace</a>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(cart.items)}">
+            <div class="table-responsive" style="margin-bottom: 2rem;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Produce / Cooperative</th>
+                            <th>Unit Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${cart.items}">
+                            <td>
+                                <strong th:text="${item.listing.title}">Produce Title</strong>
+                                <div style="font-size: 0.8125rem; color: var(--text-muted);"
+                                     th:text="${item.listing.cooperative.name + ' (' + item.listing.cooperative.district + ')'}">Cooperative</div>
+                            </td>
+                            <td>
+                                <span th:text="${#numbers.formatDecimal(item.listing.pricePerUnit, 1, 'COMMA', 0, 'POINT')} + ' RWF/' + ${item.listing.unit}">480 RWF/kg</span>
+                            </td>
+                            <td>
+                                <form th:action="@{/cart/update}" method="post" style="display: flex; gap: 0.5rem; align-items: center;">
+                                    <input type="hidden" name="cartItemId" th:value="${item.id}">
+                                    <input type="number" name="quantity" th:value="${item.quantity}" min="1"
+                                           th:max="${item.listing.availableQuantity}" class="form-control" style="width: 100px; padding: 0.35rem 0.5rem; font-size: 0.875rem;">
+                                    <button type="submit" class="btn btn-sm btn-outline">Update</button>
+                                </form>
+                            </td>
+                            <td>
+                                <strong style="color: var(--primary);"
+                                        th:text="${#numbers.formatDecimal(item.listing.pricePerUnit * item.quantity, 1, 'COMMA', 0, 'POINT')} + ' RWF'">
+                                    48,000 RWF
+                                </strong>
+                            </td>
+                            <td>
+                                <form th:action="@{/cart/remove/{id}(id=${item.id})}" method="post">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove Item">✕</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cart Summary & Checkout -->
+            <div class="card" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-direction: row; background-color: var(--bg-surface);">
+                <div>
+                    <span style="font-size: 0.875rem; color: var(--text-muted);">Total Order Amount:</span>
+                    <div style="font-size: 1.85rem; font-weight: 800; color: var(--primary);"
+                         th:text="${#numbers.formatDecimal(cartTotal, 1, 'COMMA', 0, 'POINT')} + ' RWF'">
+                        48,000 RWF
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <a th:href="@{/products}" class="btn btn-outline btn-lg">Browse More</a>
+                    <a th:href="@{/checkout}" class="btn btn-primary btn-lg">Proceed to Mobile Checkout &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
