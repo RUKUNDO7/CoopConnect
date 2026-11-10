@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Declare Harvest</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container" style="max-width: 640px;">
+        <div style="margin-bottom: 1.5rem;">
+            <a th:href="@{/farmer/dashboard}" style="font-weight: 600;">&larr; Back to Dashboard</a>
+        </div>
+
+        <div class="card" style="box-shadow: var(--shadow-md);">
+            <div class="card-header">
+                <div>
+                    <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--primary-dark);">Declare Produce Harvest</h2>
+                    <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.25rem;">
+                        Submit expected harvest details for inspection and verification by your cooperative manager.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <form th:action="@{/farmer/harvests}" th:object="${harvestRequest}" method="post">
+                    
+                    <div class="form-group">
+                        <label for="categoryId" class="form-label">Crop / Produce Category</label>
+                        <select id="categoryId" th:field="*{categoryId}" class="form-select" required>
+                            <option value="">-- Choose Produce Type --</option>
+                            <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
+                        </select>
+                        <div class="form-error" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="quantity" class="form-label">Expected Quantity</label>
+                            <input type="number" id="quantity" th:field="*{quantity}" class="form-control"
+                                   placeholder="e.g. 1500" min="0.01" step="0.01" required>
+                            <div class="form-error" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="unit" class="form-label">Unit</label>
+                            <select id="unit" th:field="*{unit}" class="form-select" required>
+                                <option value="kg">Kilograms (kg)</option>
+                                <option value="ton">Metric Tons</option>
+                                <option value="bags (50kg)">Bags (50kg)</option>
+                                <option value="bunches">Bunches</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="expectedDate" class="form-label">Expected Date of Harvest</label>
+                            <input type="date" id="expectedDate" th:field="*{expectedDate}" class="form-control" required>
+                            <div class="form-error" th:if="${#fields.hasErrors('expectedDate')}" th:errors="*{expectedDate}"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="qualityGrade" class="form-label">Anticipated Quality Grade</label>
+                            <select id="qualityGrade" th:field="*{qualityGrade}" class="form-select" required>
+                                <option value="GRADE_A">Grade A (Premium Export/Wholesale)</option>
+                                <option value="GRADE_B">Grade B (Standard Market)</option>
+                                <option value="GRADE_C">Grade C (Processing)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                        <button type="submit" class="btn btn-primary btn-lg" style="flex: 1;">
+                            Submit Declaration
+                        </button>
+                        <a th:href="@{/farmer/dashboard}" class="btn btn-outline btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
