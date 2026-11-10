@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>National Agricultural Price Index</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        <div style="margin-bottom: 2rem;">
+            <span class="hero-badge">Real-Time Market Intelligence</span>
+            <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.5rem;">
+                National Produce Price Index (Rwanda)
+            </h1>
+            <p style="color: var(--text-secondary); max-width: 700px;">
+                Transparent benchmark prices collected across Rwanda's agricultural cooperatives. Helping smallholders and buyers trade with price fairness and confidence.
+            </p>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Crop / Produce</th>
+                        <th>District / Region</th>
+                        <th>Average Price (RWF / kg)</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(priceStats)}">
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            No price data points recorded yet.
+                        </td>
+                    </tr>
+                    <tr th:each="stat : ${priceStats}">
+                        <td>
+                            <strong style="color: var(--primary-dark);" th:text="${stat.cropName}">Irish Potatoes</strong>
+                        </td>
+                        <td>
+                            <span style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                                📍 <span th:text="${stat.district}">Musanze</span>
+                            </span>
+                        </td>
+                        <td>
+                            <span style="font-size: 1.1rem; font-weight: 800; color: var(--primary);"
+                                  th:text="${#numbers.formatDecimal(stat.averagePrice, 1, 'COMMA', 2, 'POINT')} + ' RWF'">
+                                480.00 RWF
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-chip status-verified">ACTIVE BENCHMARK</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/products(district=${stat.district})}" class="btn btn-sm btn-outline">
+                                View Listings &rarr;
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
