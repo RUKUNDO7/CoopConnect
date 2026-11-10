@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>My Declared Harvests</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <a th:href="@{/farmer/dashboard}" style="font-weight: 600;">&larr; Back to Dashboard</a>
+                <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.5rem;">
+                    My Harvest Declarations
+                </h1>
+            </div>
+            <a th:href="@{/farmer/harvests/new}" class="btn btn-primary">
+                ➕ Declare New Harvest
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Declared Quantity</th>
+                        <th>Quality Grade</th>
+                        <th>Expected Date</th>
+                        <th>Status</th>
+                        <th>Verification / Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(harvests)}">
+                        <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                            No harvests recorded yet. Click "Declare New Harvest" to begin.
+                        </td>
+                    </tr>
+                    <tr th:each="h : ${harvests}">
+                        <td><strong th:text="${h.category.name}">Category</strong></td>
+                        <td th:text="${#numbers.formatDecimal(h.quantity, 1, 'COMMA', 0, 'POINT') + ' ' + h.unit}">0 kg</td>
+                        <td><span class="status-chip status-verified" th:text="${h.qualityGrade}">GRADE_A</span></td>
+                        <td th:text="${h.expectedDate}">2026-10-15</td>
+                        <td>
+                            <span th:if="${h.status.name() == 'PENDING'}" class="status-chip status-pending">PENDING</span>
+                            <span th:if="${h.status.name() == 'VERIFIED'}" class="status-chip status-verified">VERIFIED</span>
+                            <span th:if="${h.status.name() == 'REJECTED'}" class="status-chip status-rejected">REJECTED</span>
+                        </td>
+                        <td>
+                            <span th:if="${h.status.name() == 'VERIFIED'}" style="color: var(--status-success);">
+                                Verified by <strong th:text="${h.verifiedBy.fullName}">Manager</strong>
+                            </span>
+                            <span th:if="${h.status.name() == 'REJECTED'}" style="color: var(--status-error);">
+                                Reason: <span th:text="${h.rejectionReason}">Reason</span>
+                            </span>
+                            <span th:if="${h.status.name() == 'PENDING'}" style="color: var(--text-muted);">
+                                Awaiting cooperative inspection
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
