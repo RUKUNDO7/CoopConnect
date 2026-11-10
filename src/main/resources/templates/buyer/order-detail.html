@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="'Order ' + ${order.orderNumber}">Order Details</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container" style="max-width: 900px;">
+        
+        <div style="margin-bottom: 1.5rem;">
+            <a th:href="@{/orders}" style="font-weight: 600;">&larr; Back to Order History</a>
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 0.5rem;">
+                <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--primary-dark);">
+                    Order <span th:text="${order.orderNumber}">ORD-1234</span>
+                </h1>
+                <span th:if="${order.status.name() == 'PENDING'}" class="status-chip status-pending">PENDING PAYMENT</span>
+                <span th:if="${order.status.name() == 'PAID'}" class="status-chip status-paid">PAID</span>
+                <span th:if="${order.status.name() == 'DELIVERED'}" class="status-chip status-delivered">DELIVERED</span>
+                <span th:if="${order.status.name() == 'CANCELLED'}" class="status-chip status-rejected">CANCELLED</span>
+            </div>
+        </div>
+
+        <!-- Payment Action Banner if PENDING -->
+        <div th:if="${order.status.name() == 'PENDING'}" class="card" style="background-color: var(--status-pending-bg); border-color: #FCD34D; margin-bottom: 2rem; padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="color: #92400E; font-size: 1.1rem; font-weight: 700;">Awaiting Mobile Money Payment</h3>
+                    <p style="color: #B45309; font-size: 0.875rem; margin-top: 0.25rem;">
+                        Payment of <strong th:text="${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 0, 'POINT')} + ' RWF'"></strong> initiated via
+                        <span th:if="${payment != null}" th:text="${payment.provider + ' (' + payment.phoneNumber + ')'}">MTN MoMo</span>.
+                    </p>
+                </div>
+                <form th:action="@{/orders/{id}/pay(id=${order.id})}" method="post">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        📱 Simulate Mobile Payment
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 2rem;">
+            <!-- Left Column: Items & Timeline -->
+            <div>
+                <!-- Items Card -->
+                <div class="card" style="margin-bottom: 2rem;">
+                    <div class="card-header">
+                        <h3 style="font-size: 1.1rem; font-weight: 700;">Ordered Produce</h3>
+                    </div>
+                    <div class="card-body" style="padding: 0;">
+                        <div class="table-responsive" style="border: none; box-shadow: none;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Price</th>
+                                        <th>Qty</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="item : ${order.items}">
+                                        <td>
+                                            <strong th:text="${item.listing.title}">Produce</strong>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);" th:text="${item.listing.cooperative.name}">Coop</div>
+                                        </td>
+                                        <td th:text="${item.unitPrice + ' RWF'}">480 RWF</td>
+                                        <td th:text="${item.quantity + ' ' + item.listing.unit}">100 kg</td>
+                                        <td><strong style="color: var(--primary);" th:text="${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 0, 'POINT')} + ' RWF'">48,000 RWF</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer" style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <span style="font-weight: 700;">Grand Total:</span>
+                        <span style="font-size: 1.4rem; font-weight: 800; color: var(--primary);"
+                              th:text="${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 0, 'POINT')} + ' RWF'">48,000 RWF</span>
+                    </div>
+                </div>
+
+                <!-- Delivery Tracking Timeline (FR-08) -->
+                <div class="card" th:if="${delivery != null}">
+                    <div class="card-header">
+                        <h3 style="font-size: 1.1rem; font-weight: 700;">Live Delivery Tracking</h3>
+                        <span class="status-chip status-in-transit" th:text="${delivery.status}">ASSIGNED</span>
+                    </div>
+                    <div class="card-body">
+                        <div style="font-size: 0.875rem; margin-bottom: 1.25rem; color: var(--text-secondary);">
+                            <span>Transporter: </span>
+                            <strong th:text="${delivery.transporter.fullName}">Alexis Mugabo (Logistics Express)</strong>
+                            <span> • 📞 </span><span th:text="${delivery.transporter.phone}">0788888888</span>
+                        </div>
+
+                        <div class="timeline">
+                            <div th:each="update : ${deliveryUpdates}" class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-time" th:text="${#temporals.format(update.timestamp, 'MMM dd, HH:mm')}">Oct 01, 10:00</div>
+                                <div class="timeline-title" th:text="${update.status}">ASSIGNED</div>
+                                <div style="font-size: 0.8125rem; color: var(--text-muted);" th:if="${update.notes}" th:text="${update.notes}">Notes</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Buyer Rating or Details -->
+            <div>
+                <!-- Rating Form if DELIVERED and unrated (FR-10) -->
+                <div class="card" th:if="${ratingRequest != null}" style="margin-bottom: 2rem; border-color: var(--accent);">
+                    <div class="card-header" style="background-color: var(--accent-light);">
+                        <h3 style="font-size: 1rem; font-weight: 700; color: var(--accent-dark);">⭐ Rate Your Produce Delivery</h3>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/ratings}" th:object="${ratingRequest}" method="post">
+                            <input type="hidden" th:field="*{orderId}">
+
+                            <div class="form-group">
+                                <label for="score" class="form-label">Score (1 to 5 Stars)</label>
+                                <select id="score" th:field="*{score}" class="form-select" required>
+                                    <option value="5">⭐⭐⭐⭐⭐ 5 - Excellent Produce</option>
+                                    <option value="4">⭐⭐⭐⭐ 4 - Very Good</option>
+                                    <option value="3">⭐⭐⭐ 3 - Satisfactory</option>
+                                    <option value="2">⭐⭐ 2 - Poor Quality</option>
+                                    <option value="1">⭐ 1 - Substandard</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="comment" class="form-label">Review Comment</label>
+                                <textarea id="comment" th:field="*{comment}" rows="3" class="form-control"
+                                          placeholder="Describe freshness, packaging, or timeliness..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-accent btn-block">
+                                Submit Order Review
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Existing Rating if present -->
+                <div class="card" th:if="${rating != null}" style="margin-bottom: 2rem;">
+                    <div class="card-header">
+                        <h3 style="font-size: 1rem; font-weight: 700;">Your Order Review</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="font-size: 1.25rem; margin-bottom: 0.5rem;">
+                            <span th:text="${'⭐'.repeat(rating.score)}">⭐⭐⭐⭐⭐</span>
+                            <span style="font-weight: 700; margin-left: 0.5rem;" th:text="${rating.score + '/5'}">5/5</span>
+                        </div>
+                        <p style="font-size: 0.875rem; color: var(--text-secondary);" th:text="${rating.comment}">Excellent fresh produce.</p>
+                        <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;"
+                               th:text="${#temporals.format(rating.createdAt, 'yyyy-MM-dd')}">2026-10-01</small>
+                    </div>
+                </div>
+
+                <!-- Order Meta -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 style="font-size: 1rem; font-weight: 700;">Transaction Details</h3>
+                    </div>
+                    <div class="card-body" style="font-size: 0.875rem; line-height: 1.8;">
+                        <div><strong>Buyer:</strong> <span th:text="${order.buyer.fullName}">Buyer</span></div>
+                        <div><strong>Phone:</strong> <span th:text="${order.buyer.phone}">Phone</span></div>
+                        <div><strong>Ordered On:</strong> <span th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}">Date</span></div>
+                        <div th:if="${payment != null}">
+                            <div><strong>Payment Ref:</strong> <code th:text="${payment.transactionRef}">PAY-123</code></div>
+                            <div><strong>Payment Status:</strong> <span th:text="${payment.status}">SUCCESS</span></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
