@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Manager Dashboard</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <span class="hero-badge" th:text="${cooperative.name}">Cooperative Name</span>
+                <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.25rem;">
+                    Cooperative Management Portal
+                </h1>
+                <p style="color: var(--text-secondary);">
+                    Location: <span th:text="${cooperative.district + ', ' + cooperative.sector}">Musanze, Kinigi</span>
+                </p>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <a th:href="@{/manager/listings/new}" class="btn btn-primary">➕ Publish Produce Listing</a>
+                <a th:href="@{/manager/reports}" class="btn btn-outline">📊 Sales Reports</a>
+            </div>
+        </div>
+
+        <!-- Management Navigation Shortcuts -->
+        <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+            <a th:href="@{/manager/farmers}" class="btn btn-outline" style="background-color: var(--bg-surface);">
+                👨‍🌾 Farmers Membership (<span th:text="${pendingFarmersCount}">0</span> pending)
+            </a>
+            <a th:href="@{/manager/harvests}" class="btn btn-outline" style="background-color: var(--bg-surface);">
+                🌾 Harvest Inspection (<span th:text="${pendingHarvestsCount}">0</span> pending)
+            </a>
+            <a th:href="@{/manager/listings}" class="btn btn-outline" style="background-color: var(--bg-surface);">
+                📦 Active Listings (<span th:text="${totalListingsCount}">0</span>)
+            </a>
+            <a th:href="@{/manager/orders}" class="btn btn-outline" style="background-color: var(--bg-surface);">
+                🚚 Wholesale Orders & Dispatch
+            </a>
+        </div>
+
+        <!-- Metrics Row -->
+        <div class="metrics-row">
+            <div class="metric-card">
+                <div class="metric-icon-box icon-amber">⏳</div>
+                <div>
+                    <div class="metric-value" th:text="${pendingFarmersCount}">0</div>
+                    <div class="metric-title">Farmer Approvals Needed</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon-box icon-amber">🌾</div>
+                <div>
+                    <div class="metric-value" th:text="${pendingHarvestsCount}">0</div>
+                    <div class="metric-title">Pending Harvests</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon-box icon-emerald">📦</div>
+                <div>
+                    <div class="metric-value" th:text="${totalListingsCount}">0</div>
+                    <div class="metric-title">Catalog Produce Listings</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon-box icon-blue">💰</div>
+                <div>
+                    <div class="metric-value" th:text="${#lists.size(recentOrders)}">0</div>
+                    <div class="metric-title">Recent Wholesale Orders</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Wholesale Orders for Cooperative -->
+        <div class="card">
+            <div class="card-header">
+                <h3 style="font-size: 1.125rem; font-weight: 700;">Incoming Produce Orders</h3>
+                <a th:href="@{/manager/orders}" class="btn btn-sm btn-outline">Manage Orders & Dispatch &rarr;</a>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <div class="table-responsive" style="border: none; box-shadow: none;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Buyer</th>
+                                <th>Total (RWF)</th>
+                                <th>Status</th>
+                                <th>Ordered Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(recentOrders)}">
+                                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                    No incoming orders recorded for your cooperative yet.
+                                </td>
+                            </tr>
+                            <tr th:each="o : ${recentOrders}">
+                                <td><strong th:text="${o.orderNumber}">ORD-1234</strong></td>
+                                <td>
+                                    <div th:text="${o.buyer.fullName}">Buyer Name</div>
+                                    <small style="color: var(--text-muted);" th:text="${o.buyer.phone}">078XXXXXXX</small>
+                                </td>
+                                <td><strong style="color: var(--primary);" th:text="${#numbers.formatDecimal(o.totalAmount, 1, 'COMMA', 0, 'POINT')} + ' RWF'">50,000 RWF</strong></td>
+                                <td>
+                                    <span th:if="${o.status.name() == 'PENDING'}" class="status-chip status-pending">PENDING PAYMENT</span>
+                                    <span th:if="${o.status.name() == 'PAID'}" class="status-chip status-paid">PAID (READY FOR DISPATCH)</span>
+                                    <span th:if="${o.status.name() == 'DELIVERED'}" class="status-chip status-delivered">DELIVERED</span>
+                                    <span th:if="${o.status.name() == 'CANCELLED'}" class="status-chip status-rejected">CANCELLED</span>
+                                </td>
+                                <td th:text="${#temporals.format(o.createdAt, 'yyyy-MM-dd HH:mm')}">2026-10-01</td>
+                                <td>
+                                    <a th:href="@{/manager/orders}" class="btn btn-sm btn-outline">Manage Dispatch</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
