@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Rwanda Produce Marketplace</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="hero-content">
+                <span class="hero-badge">Direct Cooperative Trade</span>
+                <h1 class="hero-title">Fresh, Verified Produce from Rwandan Cooperatives</h1>
+                <p class="hero-subtitle">
+                    Source Grade A Irish potatoes, specialty Arabica coffee, climbing beans, and maize directly from verified farmer cooperatives across Rwanda.
+                </p>
+                <div class="hero-actions">
+                    <a href="#catalog" class="btn btn-accent btn-lg">Browse Produce</a>
+                    <a th:href="@{/price-dashboard}" class="btn btn-outline" style="color: #FFFFFF; border-color: rgba(255,255,255,0.4);">
+                        Check Regional Price Index &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter & Search Bar (FR-05, NFR-02) -->
+        <div class="filter-bar" id="catalog">
+            <form th:action="@{/products}" method="get" class="filter-form">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="search" class="form-label" th:text="#{common.search}">Search</label>
+                    <input type="text" id="search" name="search" th:value="${search}" class="form-control"
+                           placeholder="Search crop or cooperative...">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="categoryId" class="form-label">Category</label>
+                    <select id="categoryId" name="categoryId" class="form-select">
+                        <option value="">All Crop Categories</option>
+                        <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"
+                                th:selected="${selectedCategoryId == c.id}"></option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="district" class="form-label" th:text="#{auth.register.district}">District</label>
+                    <select id="district" name="district" class="form-select">
+                        <option value="">All Rwanda Districts</option>
+                        <option value="Musanze" th:selected="${selectedDistrict == 'Musanze'}">Musanze</option>
+                        <option value="Huye" th:selected="${selectedDistrict == 'Huye'}">Huye</option>
+                        <option value="Nyagatare" th:selected="${selectedDistrict == 'Nyagatare'}">Nyagatare</option>
+                        <option value="Rubavu" th:selected="${selectedDistrict == 'Rubavu'}">Rubavu</option>
+                        <option value="Bugesera" th:selected="${selectedDistrict == 'Bugesera'}">Bugesera</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="maxPrice" class="form-label">Max Price (RWF)</label>
+                    <input type="number" id="maxPrice" name="maxPrice" th:value="${maxPrice}" class="form-control"
+                           placeholder="e.g. 1000" min="0">
+                </div>
+
+                <div>
+                    <button type="submit" class="btn btn-primary" style="height: 42px;">
+                        <span th:text="#{common.filter}">Filter</span>
+                    </button>
+                    <a th:href="@{/products}" class="btn btn-outline" style="height: 42px; margin-left: 0.25rem;">Reset</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Produce Catalog Grid (FR-05) -->
+        <div th:if="${#lists.isEmpty(listings)}" style="text-align: center; padding: 4rem 1rem; background-color: var(--bg-surface); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+            <span style="font-size: 3rem;">🌾</span>
+            <h3 style="margin-top: 1rem; color: var(--text-primary);">No produce listings found</h3>
+            <p style="color: var(--text-muted); margin-top: 0.25rem;">Try adjusting your filters or search keywords.</p>
+            <a th:href="@{/products}" class="btn btn-primary" style="margin-top: 1.25rem;">View All Produce</a>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(listings)}" class="grid grid-cols-3">
+            <div th:each="item : ${listings}" class="card product-card">
+                <div class="product-img-wrapper">
+                    <img th:if="${item.photoUrl != null && !#strings.isEmpty(item.photoUrl)}"
+                         th:src="@{${item.photoUrl}}" th:alt="${item.title}" class="product-img"
+                         onerror="this.onerror=null; this.parentElement.innerHTML='🌱';">
+                    <span th:unless="${item.photoUrl != null && !#strings.isEmpty(item.photoUrl)}">🌱</span>
+                    <span class="product-grade-badge" th:text="${item.harvest.qualityGrade}">GRADE_A</span>
+                </div>
+
+                <div class="product-info">
+                    <div class="product-coop">
+                        <span>🏢</span>
+                        <span th:text="${item.cooperative.name + ' • ' + item.cooperative.district}">Cooperative</span>
+                    </div>
+
+                    <h3 class="product-title" th:text="${item.title}">Produce Title</h3>
+
+                    <div style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                        <span>Farmer: </span>
+                        <strong th:text="${item.harvest.farmer.fullName}">Jean Baptiste</strong>
+                    </div>
+
+                    <div class="product-meta">
+                        <div>
+                            <div class="product-price">
+                                <span th:text="${#numbers.formatDecimal(item.pricePerUnit, 1, 'COMMA', 0, 'POINT')}">500</span>
+                                <span class="product-price-unit" th:text="${' ' + item.currency + '/' + item.unit}"> RWF/kg</span>
+                            </div>
+                            <div class="product-stock" th:text="${#numbers.formatDecimal(item.availableQuantity, 1, 'COMMA', 0, 'POINT') + ' ' + item.unit + ' available'}">
+                                3,000 kg available
+                            </div>
+                        </div>
+
+                        <a th:href="@{/products/{id}(id=${item.id})}" class="btn btn-sm btn-primary">
+                            Details &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination Controls (NFR-02) -->
+        <div th:if="${page.totalPages > 1}" class="pagination">
+            <a th:if="${page.hasPrevious()}"
+               th:href="@{/products(page=${page.number - 1}, categoryId=${selectedCategoryId}, district=${selectedDistrict}, search=${search}, maxPrice=${maxPrice})}"
+               class="page-item">&laquo; Previous</a>
+
+            <span th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
+                <a th:href="@{/products(page=${i}, categoryId=${selectedCategoryId}, district=${selectedDistrict}, search=${search}, maxPrice=${maxPrice})}"
+                   th:text="${i + 1}"
+                   th:classappend="${i == page.number} ? 'active' : ''"
+                   class="page-item">1</a>
+            </span>
+
+            <a th:if="${page.hasNext()}"
+               th:href="@{/products(page=${page.number + 1}, categoryId=${selectedCategoryId}, district=${selectedDistrict}, search=${search}, maxPrice=${maxPrice})}"
+               class="page-item">Next &raquo;</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
