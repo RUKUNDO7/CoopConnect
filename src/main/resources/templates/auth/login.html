@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Sign In</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container" style="max-width: 480px; margin-top: 1.5rem;">
+        <div class="card" style="box-shadow: var(--shadow-lg);">
+            <div class="card-header" style="text-align: center; display: block; padding: 2rem 2rem 1rem;">
+                <span style="font-size: 2.5rem; display: block; margin-bottom: 0.5rem;">🌱</span>
+                <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary-dark);" th:text="#{auth.login.title}">Sign in to CoopConnect</h2>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;" th:text="#{auth.login.subtitle}">
+                    Empowering Rwandan agriculture through direct market access
+                </p>
+            </div>
+
+            <div class="card-body" style="padding: 1.5rem 2rem 2rem;">
+                <form th:action="@{/login}" method="post">
+                    <!-- CSRF is automatically added by Spring Security in Thymeleaf forms -->
+                    <div class="form-group">
+                        <label for="username" class="form-label" th:text="#{auth.login.email}">Email Address</label>
+                        <input type="email" id="username" name="username" class="form-control"
+                               placeholder="e.g. farmer.jean@coopconnect.rw" required autofocus>
+                    </div>
+
+                    <div class="form-group">
+                        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.4rem;">
+                            <label for="password" class="form-label" style="margin-bottom: 0;" th:text="#{auth.login.password}">Password</label>
+                            <a th:href="@{/reset-password}" style="font-size: 0.8125rem; font-weight: 600;" th:text="#{auth.login.forgot_password}">Forgot password?</a>
+                        </div>
+                        <input type="password" id="password" name="password" class="form-control"
+                               placeholder="••••••••" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1.5rem;" th:text="#{auth.login.btn}">
+                        Sign In
+                    </button>
+                </form>
+
+                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light); text-align: center; font-size: 0.875rem;">
+                    <span style="color: var(--text-muted);" th:text="#{auth.login.no_account}">Don't have an account?</span>
+                    <a th:href="@{/register}" style="font-weight: 700; margin-left: 0.25rem;" th:text="#{auth.login.register_here}">Register here</a>
+                </div>
+
+                <!-- Persona Quick Helper for testing -->
+                <div style="margin-top: 1.5rem; background-color: var(--bg-main); padding: 1rem; border-radius: var(--radius-md); font-size: 0.75rem; color: var(--text-secondary);">
+                    <strong>Quick Test Personas (password: password123):</strong>
+                    <div style="margin-top: 0.35rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem;">
+                        <span>👨‍🌾 <code>farmer.jean@coopconnect.rw</code></span>
+                        <span>🏢 <code>manager@musanze.rw</code></span>
+                        <span>🛒 <code>buyer@kigali.rw</code></span>
+                        <span>🚚 <code>transporter@express.rw</code></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
