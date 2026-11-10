@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>My Orders</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <a th:href="@{/buyer/dashboard}" style="font-weight: 600;">&larr; Back to Dashboard</a>
+                <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.5rem;">
+                    My Wholesale Orders
+                </h1>
+            </div>
+            <a th:href="@{/products}" class="btn btn-primary">Browse Marketplace</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Order Number</th>
+                        <th>Produce Summary</th>
+                        <th>Total Amount</th>
+                        <th>Order Status</th>
+                        <th>Order Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(orders)}">
+                        <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                            You have no recorded orders yet.
+                        </td>
+                    </tr>
+                    <tr th:each="o : ${orders}">
+                        <td><strong th:text="${o.orderNumber}">ORD-1234</strong></td>
+                        <td>
+                            <ul style="list-style: none; padding-left: 0; font-size: 0.875rem;">
+                                <li th:each="item : ${o.items}">
+                                    <span th:text="${item.listing.title}">Produce</span>
+                                    <span style="color: var(--text-muted);" th:text="${' (' + item.quantity + ' ' + item.listing.unit + ')'}">(100 kg)</span>
+                                </li>
+                            </ul>
+                        </td>
+                        <td><strong style="color: var(--primary);" th:text="${#numbers.formatDecimal(o.totalAmount, 1, 'COMMA', 0, 'POINT')} + ' RWF'">48,000 RWF</strong></td>
+                        <td>
+                            <span th:if="${o.status.name() == 'PENDING'}" class="status-chip status-pending">PENDING PAYMENT</span>
+                            <span th:if="${o.status.name() == 'PAID'}" class="status-chip status-paid">PAID</span>
+                            <span th:if="${o.status.name() == 'DELIVERED'}" class="status-chip status-delivered">DELIVERED</span>
+                            <span th:if="${o.status.name() == 'CANCELLED'}" class="status-chip status-rejected">CANCELLED</span>
+                        </td>
+                        <td th:text="${#temporals.format(o.createdAt, 'yyyy-MM-dd HH:mm')}">2026-10-01</td>
+                        <td>
+                            <a th:href="@{/orders/{id}(id=${o.id})}" class="btn btn-sm btn-outline">
+                                View Order & Track &rarr;
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
