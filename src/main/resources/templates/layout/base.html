@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$CONTENT_TITLE - CoopConnect">CoopConnect — Rwanda Produce Marketplace</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+    <!-- Top Utility Bar -->
+    <div class="top-bar">
+        <div class="container top-bar-inner">
+            <div class="top-bar-left">
+                <span class="pulse-dot"></span>
+                <span>🇷🇼 Connecting Rwanda Farmers Directly to Bulk Produce Buyers</span>
+            </div>
+            <div class="top-bar-right">
+                <div class="lang-switch">
+                    <span>🌐</span>
+                    <a th:href="@{/(lang='en')}" class="lang-link">English</a>
+                    <span class="lang-divider">|</span>
+                    <a th:href="@{/(lang='rw')}" class="lang-link">Ikinyarwanda</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <header class="navbar">
+        <div class="container navbar-inner">
+            <a th:href="@{/products}" class="logo">
+                <span class="logo-icon">🌱</span>
+                <span class="logo-text">Coop<span class="accent-text">Connect</span></span>
+            </a>
+
+            <nav class="nav-links">
+                <a th:href="@{/products}" class="nav-link" th:text="#{nav.marketplace}">Marketplace</a>
+                <a th:href="@{/price-dashboard}" class="nav-link" th:text="#{nav.price_dashboard}">Price Index</a>
+
+                <!-- Role specific shortcuts -->
+                <div sec:authorize="hasRole('FARMER')">
+                    <a th:href="@{/farmer/dashboard}" class="nav-link">Farmer Portal</a>
+                </div>
+                <div sec:authorize="hasRole('COOPERATIVE_MANAGER')">
+                    <a th:href="@{/manager/dashboard}" class="nav-link">Manager Portal</a>
+                </div>
+                <div sec:authorize="hasRole('BUYER')">
+                    <a th:href="@{/buyer/dashboard}" class="nav-link">My Orders</a>
+                </div>
+                <div sec:authorize="hasRole('TRANSPORTER')">
+                    <a th:href="@{/transporter/dashboard}" class="nav-link">Deliveries</a>
+                </div>
+                <div sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/admin/dashboard}" class="nav-link">Administration</a>
+                </div>
+            </nav>
+
+            <div class="nav-actions">
+                <!-- Buyer Shopping Cart -->
+                <a th:href="@{/cart}" class="cart-btn" sec:authorize="hasRole('BUYER')">
+                    🛒
+                    <span class="cart-count" th:text="${cartItemCount ?: 0}">0</span>
+                </a>
+
+                <!-- Notifications -->
+                <div class="nav-notifications" sec:authorize="isAuthenticated()">
+                    <a th:href="@{/notifications}" class="notification-btn" title="Notifications">
+                        🔔
+                        <span class="badge-count" th:if="${unreadNotificationCount > 0}" th:text="${unreadNotificationCount}"></span>
+                    </a>
+                </div>
+
+                <!-- Unauthenticated user actions -->
+                <div class="auth-buttons" sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/login}" class="btn btn-outline" th:text="#{nav.login}">Sign In</a>
+                    <a th:href="@{/register}" class="btn btn-primary" th:text="#{nav.register}">Register</a>
+                </div>
+
+                <!-- Authenticated user menu -->
+                <div class="user-menu" sec:authorize="isAuthenticated()">
+                    <div class="user-profile-badge">
+                        <div class="avatar" th:text="${#strings.substring(currentUser.fullName, 0, 1)}">U</div>
+                        <div class="user-details">
+                            <span class="user-name" th:text="${currentUser.fullName}">User Name</span>
+                            <span class="user-role-chip" th:text="${currentUser.role}">ROLE</span>
+                        </div>
+                    </div>
+                    <form th:action="@{/logout}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Sign Out">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Global Alerts -->
+    <div class="container alerts-container" style="margin-top: 1rem;">
+        <div th:if="${successMessage}" class="alert alert-success">
+            <span class="alert-icon">✓</span>
+            <span th:text="${successMessage}">Operation successful!</span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-error">
+            <span class="alert-icon">✕</span>
+            <span th:text="${errorMessage}">An error occurred.</span>
+        </div>
+    </div>
+
+    <!-- Main Content Body -->
+    <main class="main-content">
+        <div layout:fragment="content">
+            <!-- Child page content inserted here -->
+        </div>
+    </main>
+
+    <!-- Modern Rwandan Themed Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-col brand-col">
+                <div class="logo footer-logo">
+                    <span class="logo-icon">🌱</span>
+                    <span class="logo-text">Coop<span class="accent-text">Connect</span></span>
+                </div>
+                <p class="footer-desc">
+                    Bridging Rwandan agricultural cooperatives and wholesale buyers. Direct, fair-price, verified produce logistics and mobile payments.
+                </p>
+                <div class="footer-badges">
+                    <span class="badge-tag">🇷🇼 Made in Rwanda</span>
+                    <span class="badge-tag">🔒 MoMo & Airtel Secure</span>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4 class="footer-title">Platform</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/products}">Marketplace Catalog</a></li>
+                    <li><a th:href="@{/price-dashboard}">National Price Index</a></li>
+                    <li><a th:href="@{/register}">Register Cooperative</a></li>
+                    <li><a th:href="@{/login}">Portal Sign In</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4 class="footer-title">Major Cooperatives</h4>
+                <ul class="footer-links">
+                    <li>Musanze Potato Farmers (COAPOV)</li>
+                    <li>Huye Grain & Coffee (KOPAKAMA)</li>
+                    <li>Nyagatare Maize & Dairy (COVANYA)</li>
+                    <li>Bugesera Horticulture Union</li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4 class="footer-title">Supported Crops</h4>
+                <div class="crop-tags">
+                    <span class="crop-pill">Kinigi Potatoes</span>
+                    <span class="crop-pill">Specialty Coffee</span>
+                    <span class="crop-pill">Climbing Beans</span>
+                    <span class="crop-pill">Grade A Maize</span>
+                    <span class="crop-pill">Plantains</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="container footer-bottom-inner">
+                <p>&copy; 2026 CoopConnect Rwanda. All rights reserved.</p>
+                <div class="footer-legal">
+                    <span>Agricultural Direct Trade & Transparency Initiative</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Minimal Vanilla JS -->
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>
