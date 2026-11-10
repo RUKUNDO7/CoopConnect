@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Register Account</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container" style="max-width: 600px; margin-top: 1.5rem;">
+        <div class="card" style="box-shadow: var(--shadow-lg);">
+            <div class="card-header" style="text-align: center; display: block; padding: 2rem 2rem 1rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary-dark);" th:text="#{auth.register.title}">Create an Account</h2>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;" th:text="#{auth.register.subtitle}">
+                    Join Rwanda's digital cooperative marketplace
+                </p>
+            </div>
+
+            <div class="card-body" style="padding: 1.5rem 2rem 2rem;">
+                <form th:action="@{/register}" th:object="${registrationRequest}" method="post">
+                    
+                    <div class="form-group">
+                        <label for="fullName" class="form-label" th:text="#{auth.register.fullname}">Full Name</label>
+                        <input type="text" id="fullName" th:field="*{fullName}" class="form-control"
+                               placeholder="e.g. Jean Baptiste Bizimana" required>
+                        <div class="form-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="email" class="form-label" th:text="#{auth.login.email}">Email Address</label>
+                            <input type="email" id="email" th:field="*{email}" class="form-control"
+                                   placeholder="name@domain.rw" required>
+                            <div class="form-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone" class="form-label" th:text="#{auth.register.phone}">Phone Number</label>
+                            <input type="tel" id="phone" th:field="*{phone}" class="form-control"
+                                   placeholder="078XXXXXXX" required>
+                            <div class="form-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="password" class="form-label" th:text="#{auth.login.password}">Password</label>
+                            <input type="password" id="password" th:field="*{password}" class="form-control"
+                                   placeholder="Min. 8 characters" required>
+                            <div class="form-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="role" class="form-label" th:text="#{auth.register.role}">User Role</label>
+                            <select id="role" th:field="*{role}" class="form-select" onchange="toggleFarmerFields()" required>
+                                <option value="" disabled selected>-- Select Role --</option>
+                                <option th:each="r : ${roles}" th:value="${r}" th:text="#{${'role.' + r}}"></option>
+                            </select>
+                            <div class="form-error" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Farmer-specific Onboarding Information (FR-02) -->
+                    <div id="farmerFields" style="display: none; background-color: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem;">
+                        <h4 style="font-size: 0.9375rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 0.75rem;" th:text="#{auth.register.farmer_details}">
+                            Farmer Cooperative Information
+                        </h4>
+                        
+                        <div class="form-group">
+                            <label for="nationalId" class="form-label" th:text="#{auth.register.national_id}">National ID (16 digits)</label>
+                            <input type="text" id="nationalId" th:field="*{nationalId}" class="form-control"
+                                   placeholder="119XXXXXXXXXXXXX" maxlength="16">
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label for="district" class="form-label" th:text="#{auth.register.district}">District</label>
+                                <input type="text" id="district" th:field="*{district}" class="form-control"
+                                       placeholder="e.g. Musanze">
+                            </div>
+                            <div class="form-group">
+                                <label for="sector" class="form-label" th:text="#{auth.register.sector}">Sector</label>
+                                <input type="text" id="sector" th:field="*{sector}" class="form-control"
+                                       placeholder="e.g. Kinigi">
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="cooperativeId" class="form-label" th:text="#{auth.register.cooperative}">Cooperative</label>
+                            <select id="cooperativeId" th:field="*{cooperativeId}" class="form-select">
+                                <option value="">-- Choose Cooperative --</option>
+                                <option th:each="c : ${cooperatives}" th:value="${c.id}"
+                                        th:text="${c.name + ' (' + c.district + ')'}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" th:text="#{auth.register.btn}">
+                        Create Account
+                    </button>
+                </form>
+
+                <div style="margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border-light); text-align: center; font-size: 0.875rem;">
+                    <span style="color: var(--text-muted);" th:text="#{auth.register.have_account}">Already have an account?</span>
+                    <a th:href="@{/login}" style="font-weight: 700; margin-left: 0.25rem;" th:text="#{auth.login.btn}">Sign In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleFarmerFields() {
+            const roleSelect = document.getElementById('role');
+            const farmerFields = document.getElementById('farmerFields');
+            if (roleSelect && farmerFields) {
+                farmerFields.style.display = (roleSelect.value === 'FARMER') ? 'block' : 'none';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', toggleFarmerFields);
+    </script>
+</div>
+</body>
+</html>
