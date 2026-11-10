@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Farmer Dashboard</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark);">Farmer Portal</h1>
+                <p style="color: var(--text-secondary);">Manage your seasonal harvest declarations and cooperative membership.</p>
+            </div>
+            <a th:href="@{/farmer/harvests/new}" class="btn btn-primary btn-lg">
+                ➕ Declare New Harvest
+            </a>
+        </div>
+
+        <!-- Approval Status Notice (FR-02) -->
+        <div th:if="${profile != null}" style="margin-bottom: 2rem;">
+            <div th:if="${profile.approvalStatus.name() == 'PENDING'}" class="alert alert-error" style="background-color: var(--status-pending-bg); border-color: #FCD34D; color: #92400E;">
+                <span class="alert-icon">⏳</span>
+                <div>
+                    <strong>Membership Pending Approval:</strong> Your application to join <span th:text="${profile.cooperative.name}">Cooperative</span> is under review by the manager.
+                </div>
+            </div>
+            <div th:if="${profile.approvalStatus.name() == 'APPROVED'}" class="alert alert-success">
+                <span class="alert-icon">✓</span>
+                <div>
+                    <strong>Active Cooperative Member:</strong> Verified member of <strong th:text="${profile.cooperative.name}">Cooperative</strong> (<span th:text="${profile.district}">District</span>).
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Row (FR-03) -->
+        <div class="metrics-row">
+            <div class="metric-card">
+                <div class="metric-icon-box icon-emerald">🌾</div>
+                <div>
+                    <div class="metric-value" th:text="${totalHarvests}">0</div>
+                    <div class="metric-title">Total Harvests</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon-box icon-amber">⏳</div>
+                <div>
+                    <div class="metric-value" th:text="${pendingCount}">0</div>
+                    <div class="metric-title">Pending Verification</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon-box icon-emerald">✓</div>
+                <div>
+                    <div class="metric-value" th:text="${verifiedCount}">0</div>
+                    <div class="metric-title">Verified & Listed</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon-box icon-red">✕</div>
+                <div>
+                    <div class="metric-value" th:text="${rejectedCount}">0</div>
+                    <div class="metric-title">Rejected</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Harvests Table -->
+        <div class="card">
+            <div class="card-header">
+                <h3 style="font-size: 1.125rem; font-weight: 700;">Recent Declared Harvests</h3>
+                <a th:href="@{/farmer/harvests}" class="btn btn-sm btn-outline">View All &rarr;</a>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <div class="table-responsive" style="border: none; box-shadow: none;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                                <th>Quality Grade</th>
+                                <th>Expected Date</th>
+                                <th>Status</th>
+                                <th>Coop Verification</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(recentHarvests)}">
+                                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                    You have not declared any harvests yet. Click "Declare New Harvest" above!
+                                </td>
+                            </tr>
+                            <tr th:each="h : ${recentHarvests}">
+                                <td><strong th:text="${h.category.name}">Irish Potatoes</strong></td>
+                                <td th:text="${#numbers.formatDecimal(h.quantity, 1, 'COMMA', 0, 'POINT') + ' ' + h.unit}">1,000 kg</td>
+                                <td><span class="status-chip status-verified" th:text="${h.qualityGrade}">GRADE_A</span></td>
+                                <td th:text="${h.expectedDate}">2026-10-15</td>
+                                <td>
+                                    <span th:if="${h.status.name() == 'PENDING'}" class="status-chip status-pending">PENDING</span>
+                                    <span th:if="${h.status.name() == 'VERIFIED'}" class="status-chip status-verified">VERIFIED</span>
+                                    <span th:if="${h.status.name() == 'REJECTED'}" class="status-chip status-rejected">REJECTED</span>
+                                </td>
+                                <td>
+                                    <span th:if="${h.verifiedBy != null}" th:text="${'By ' + h.verifiedBy.fullName}">Manager</span>
+                                    <span th:if="${h.verifiedBy == null}" style="color: var(--text-muted);">Awaiting inspection</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
