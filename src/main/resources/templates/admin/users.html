@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Manage Platform Users</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <a th:href="@{/admin/dashboard}" style="font-weight: 600;">&larr; Back to Dashboard</a>
+                <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.5rem;">
+                    Platform Users & Roles
+                </h1>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>User Name</th>
+                        <th>Email Address</th>
+                        <th>Phone</th>
+                        <th>Assigned Role</th>
+                        <th>Account Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="u : ${users}">
+                        <td><strong th:text="${u.fullName}">Full Name</strong></td>
+                        <td th:text="${u.email}">email@domain.rw</td>
+                        <td th:text="${u.phone}">078XXXXXXX</td>
+                        <td><span class="status-chip status-in-transit" th:text="${u.role}">ROLE</span></td>
+                        <td>
+                            <span th:if="${u.enabled}" class="status-chip status-approved">ACTIVE</span>
+                            <span th:unless="${u.enabled}" class="status-chip status-rejected">DISABLED</span>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/users/{id}/toggle(id=${u.id})}" method="post">
+                                <button type="submit" class="btn btn-sm" th:classappend="${u.enabled} ? 'btn-outline-danger' : 'btn-primary'"
+                                        th:text="${u.enabled} ? 'Disable Account' : 'Enable Account'"></button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
