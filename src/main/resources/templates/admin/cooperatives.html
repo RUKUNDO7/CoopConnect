@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Manage Cooperatives</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <a th:href="@{/admin/dashboard}" style="font-weight: 600;">&larr; Back to Dashboard</a>
+                <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.5rem;">
+                    Rwandan Agricultural Cooperatives
+                </h1>
+            </div>
+            <button onclick="document.getElementById('newCoopForm').scrollIntoView({behavior: 'smooth'})" class="btn btn-primary">
+                ➕ Add New Cooperative
+            </button>
+        </div>
+
+        <div class="table-responsive" style="margin-bottom: 3rem;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Cooperative Name</th>
+                        <th>District</th>
+                        <th>Sector</th>
+                        <th>Manager Assigned</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="c : ${cooperatives}">
+                        <td><strong th:text="${c.name}">Cooperative Name</strong></td>
+                        <td>📍 <span th:text="${c.district}">Musanze</span></td>
+                        <td th:text="${c.sector}">Kinigi</td>
+                        <td>
+                            <strong th:if="${c.manager != null}" th:text="${c.manager.fullName}">Manager</strong>
+                            <span th:if="${c.manager == null}" style="color: var(--text-muted);">Unassigned</span>
+                        </td>
+                        <td style="font-size: 0.8125rem; color: var(--text-secondary); max-width: 300px;" th:text="${c.description}">Description</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add New Cooperative Form -->
+        <div class="card" id="newCoopForm" style="max-width: 650px; margin: 0 auto; box-shadow: var(--shadow-md);">
+            <div class="card-header">
+                <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary-dark);">Register New Agricultural Cooperative</h3>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/admin/cooperatives}" method="post">
+                    <div class="form-group">
+                        <label for="name" class="form-label">Cooperative Name</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Bugesera Cassava & Horticulture Union" required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="district" class="form-label">District</label>
+                            <input type="text" id="district" name="district" class="form-control" placeholder="e.g. Bugesera" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sector" class="form-label">Sector</label>
+                            <input type="text" id="sector" name="sector" class="form-control" placeholder="e.g. Nyamata" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="managerId" class="form-label">Assign Manager</label>
+                        <select id="managerId" name="managerId" class="form-select">
+                            <option value="">-- Select Registered Manager --</option>
+                            <option th:each="m : ${managers}" th:value="${m.id}" th:text="${m.fullName + ' (' + m.email + ')'}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description" class="form-label">Description / Produce Focus</label>
+                        <textarea id="description" name="description" rows="3" class="form-control" placeholder="Specialization, member size, etc."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg">
+                        Create Cooperative
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
