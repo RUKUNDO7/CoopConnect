@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Wholesale Orders & Logistics</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <a th:href="@{/manager/dashboard}" style="font-weight: 600;">&larr; Back to Dashboard</a>
+                <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.5rem;">
+                    Cooperative Wholesale Orders & Logistics
+                </h1>
+                <p style="color: var(--text-secondary);">Manage incoming orders, confirm payments, and dispatch assigned transporters.</p>
+            </div>
+            <a th:href="@{/manager/reports}" class="btn btn-outline">📊 Export CSV Report</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Buyer & Contact</th>
+                        <th>Produce Items</th>
+                        <th>Total Amount</th>
+                        <th>Order Status</th>
+                        <th>Transporter Assignment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(orders)}">
+                        <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                            No orders placed yet for your cooperative produce.
+                        </td>
+                    </tr>
+                    <tr th:each="o : ${orders}">
+                        <td><strong th:text="${o.orderNumber}">ORD-1234</strong></td>
+                        <td>
+                            <strong th:text="${o.buyer.fullName}">Buyer Name</strong>
+                            <div style="font-size: 0.8125rem; color: var(--text-muted);" th:text="${o.buyer.phone}">078XXXXXXX</div>
+                        </td>
+                        <td>
+                            <ul style="list-style: none; padding-left: 0; font-size: 0.875rem;">
+                                <li th:each="item : ${o.items}">
+                                    <span th:text="${item.listing.title}">Produce</span>
+                                    <span style="color: var(--text-muted);" th:text="${' (' + item.quantity + ' ' + item.listing.unit + ')'}">(100 kg)</span>
+                                </li>
+                            </ul>
+                        </td>
+                        <td><strong style="color: var(--primary);" th:text="${#numbers.formatDecimal(o.totalAmount, 1, 'COMMA', 0, 'POINT')} + ' RWF'">48,000 RWF</strong></td>
+                        <td>
+                            <span th:if="${o.status.name() == 'PENDING'}" class="status-chip status-pending">PENDING PAYMENT</span>
+                            <span th:if="${o.status.name() == 'PAID'}" class="status-chip status-paid">PAID (READY TO DISPATCH)</span>
+                            <span th:if="${o.status.name() == 'DELIVERED'}" class="status-chip status-delivered">DELIVERED</span>
+                            <span th:if="${o.status.name() == 'CANCELLED'}" class="status-chip status-rejected">CANCELLED</span>
+                        </td>
+                        <td>
+                            <!-- If order is PAID, manager can assign transporter -->
+                            <div th:if="${o.status.name() == 'PAID'}">
+                                <form th:action="@{/manager/orders/{id}/assign-delivery(id=${o.id})}" method="post" style="display: flex; gap: 0.5rem; align-items: center;">
+                                    <select name="transporterId" class="form-select" style="font-size: 0.8125rem; padding: 0.35rem 0.5rem;" required>
+                                        <option value="">-- Assign Transporter --</option>
+                                        <option th:each="t : ${transporters}" th:value="${t.id}" th:text="${t.fullName + ' (' + t.phone + ')'}"></option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-primary">Dispatch</button>
+                                </form>
+                            </div>
+                            <div th:if="${o.status.name() == 'PENDING'}" style="font-size: 0.8125rem; color: var(--text-muted);">
+                                Awaiting buyer payment
+                            </div>
+                            <div th:if="${o.status.name() == 'DELIVERED'}" style="font-size: 0.8125rem; color: var(--status-success); font-weight: 600;">
+                                ✓ Delivered to buyer
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
