@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Harvest Verification</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <a th:href="@{/manager/dashboard}" style="font-weight: 600;">&larr; Back to Dashboard</a>
+                <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.5rem;">
+                    Harvest Inspection & Verification
+                </h1>
+                <p style="color: var(--text-secondary);" th:text="${cooperative.name}">Cooperative</p>
+            </div>
+        </div>
+
+        <!-- Section 1: Pending Harvest Declarations -->
+        <div style="margin-bottom: 3rem;">
+            <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary-dark);">
+                Pending Inspection (<span th:text="${#lists.size(pendingHarvests)}">0</span>)
+            </h2>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Farmer</th>
+                            <th>Produce / Category</th>
+                            <th>Quantity</th>
+                            <th>Quality Grade</th>
+                            <th>Expected Date</th>
+                            <th>Verification Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(pendingHarvests)}">
+                            <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                No pending harvest declarations requiring inspection right now.
+                            </td>
+                        </tr>
+                        <tr th:each="h : ${pendingHarvests}">
+                            <td>
+                                <strong th:text="${h.farmer.fullName}">Farmer Name</strong>
+                                <div style="font-size: 0.8125rem; color: var(--text-muted);" th:text="${h.farmer.phone}">078XXXXXXX</div>
+                            </td>
+                            <td><strong th:text="${h.category.name}">Category</strong></td>
+                            <td th:text="${#numbers.formatDecimal(h.quantity, 1, 'COMMA', 0, 'POINT') + ' ' + h.unit}">1,000 kg</td>
+                            <td><span class="status-chip status-verified" th:text="${h.qualityGrade}">GRADE_A</span></td>
+                            <td th:text="${h.expectedDate}">2026-10-15</td>
+                            <td>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <form th:action="@{/manager/harvests/{id}/verify(id=${h.id})}" method="post">
+                                        <button type="submit" class="btn btn-sm btn-primary">Verify Harvest</button>
+                                    </form>
+                                    <form th:action="@{/manager/harvests/{id}/reject(id=${h.id})}" method="post"
+                                          onsubmit="const r = prompt('Reason for harvest rejection:'); if(!r) return false; this.reason.value = r;">
+                                        <input type="hidden" name="reason" value="">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section 2: Verified Harvests (Ready to List) -->
+        <div>
+            <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary-dark);">
+                Verified Harvests (Ready for Marketplace Listing)
+            </h2>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Farmer</th>
+                            <th>Produce</th>
+                            <th>Quantity</th>
+                            <th>Quality Grade</th>
+                            <th>Expected Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(verifiedHarvests)}">
+                            <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                No verified harvests ready for listing.
+                            </td>
+                        </tr>
+                        <tr th:each="h : ${verifiedHarvests}">
+                            <td><strong th:text="${h.farmer.fullName}">Farmer Name</strong></td>
+                            <td><strong th:text="${h.category.name}">Category</strong></td>
+                            <td th:text="${#numbers.formatDecimal(h.quantity, 1, 'COMMA', 0, 'POINT') + ' ' + h.unit}">1,000 kg</td>
+                            <td><span class="status-chip status-verified" th:text="${h.qualityGrade}">GRADE_A</span></td>
+                            <td th:text="${h.expectedDate}">2026-10-15</td>
+                            <td>
+                                <a th:href="@{/manager/listings/new(harvestId=${h.id})}" class="btn btn-sm btn-primary">
+                                    Publish to Marketplace &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
