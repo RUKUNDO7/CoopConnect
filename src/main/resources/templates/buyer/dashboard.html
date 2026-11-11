@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Buyer Dashboard</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark);">Buyer Portal</h1>
+                <p style="color: var(--text-secondary);">Direct cooperative wholesale orders, mobile payment status, and delivery tracking.</p>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <a th:href="@{/cart}" class="btn btn-outline">🛒 View Cart (<span th:text="${cartItemCount}">0</span>)</a>
+                <a th:href="@{/products}" class="btn btn-primary">Browse Marketplace</a>
+            </div>
+        </div>
+
+        <div class="metrics-row">
+            <div class="metric-card">
+                <div class="metric-icon-box icon-emerald">📦</div>
+                <div>
+                    <div class="metric-value" th:text="${totalOrders}">0</div>
+                    <div class="metric-title">Total Orders Placed</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon-box icon-amber">🛒</div>
+                <div>
+                    <div class="metric-value" th:text="${cartItemCount}">0</div>
+                    <div class="metric-title">Produce Items in Cart</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="card">
+            <div class="card-header">
+                <h3 style="font-size: 1.125rem; font-weight: 700;">Recent Orders</h3>
+                <a th:href="@{/orders}" class="btn btn-sm btn-outline">View Order History &rarr;</a>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <div class="table-responsive" style="border: none; box-shadow: none;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Produce Items</th>
+                                <th>Total (RWF)</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(orders)}">
+                                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                    You have not placed any orders yet. Visit the <a th:href="@{/products}">Marketplace</a> to start!
+                                </td>
+                            </tr>
+                            <tr th:each="o : ${orders}">
+                                <td><strong th:text="${o.orderNumber}">ORD-1234</strong></td>
+                                <td>
+                                    <ul style="list-style: none; padding-left: 0; font-size: 0.875rem;">
+                                        <li th:each="item : ${o.items}">
+                                            <span th:text="${item.listing.title}">Produce</span>
+                                            <span style="color: var(--text-muted);" th:text="${' (' + item.quantity + ' ' + item.listing.unit + ')'}">(100 kg)</span>
+                                        </li>
+                                    </ul>
+                                </td>
+                                <td><strong style="color: var(--primary);" th:text="${#numbers.formatDecimal(o.totalAmount, 1, 'COMMA', 0, 'POINT')} + ' RWF'">50,000 RWF</strong></td>
+                                <td>
+                                    <span th:if="${o.status.name() == 'PENDING'}" class="status-chip status-pending">PENDING PAYMENT</span>
+                                    <span th:if="${o.status.name() == 'PAID'}" class="status-chip status-paid">PAID</span>
+                                    <span th:if="${o.status.name() == 'DELIVERED'}" class="status-chip status-delivered">DELIVERED</span>
+                                    <span th:if="${o.status.name() == 'CANCELLED'}" class="status-chip status-rejected">CANCELLED</span>
+                                </td>
+                                <td th:text="${#temporals.format(o.createdAt, 'yyyy-MM-dd HH:mm')}">2026-10-01</td>
+                                <td>
+                                    <a th:href="@{/orders/{id}(id=${o.id})}" class="btn btn-sm btn-outline">Details & Track &rarr;</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
