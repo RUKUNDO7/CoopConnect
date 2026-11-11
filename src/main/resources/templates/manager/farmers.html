@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Cooperative Farmers</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <a th:href="@{/manager/dashboard}" style="font-weight: 600;">&larr; Back to Dashboard</a>
+                <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.5rem;">
+                    Farmer Membership Management
+                </h1>
+                <p style="color: var(--text-secondary);" th:text="${cooperative.name}">Cooperative</p>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Farmer Full Name</th>
+                        <th>National ID (NID)</th>
+                        <th>Phone</th>
+                        <th>Sector / District</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(farmers)}">
+                        <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                            No farmers have registered under your cooperative yet.
+                        </td>
+                    </tr>
+                    <tr th:each="f : ${farmers}">
+                        <td><strong th:text="${f.user.fullName}">Jean Baptiste Bizimana</strong></td>
+                        <td><code th:text="${f.nationalId}">1198580012345678</code></td>
+                        <td th:text="${f.user.phone}">0788444444</td>
+                        <td th:text="${f.sector + ', ' + f.district}">Kinigi, Musanze</td>
+                        <td>
+                            <span th:if="${f.approvalStatus.name() == 'PENDING'}" class="status-chip status-pending">PENDING</span>
+                            <span th:if="${f.approvalStatus.name() == 'APPROVED'}" class="status-chip status-approved">APPROVED</span>
+                            <span th:if="${f.approvalStatus.name() == 'REJECTED'}" class="status-chip status-rejected">REJECTED</span>
+                        </td>
+                        <td>
+                            <div th:if="${f.approvalStatus.name() == 'PENDING'}" style="display: flex; gap: 0.5rem;">
+                                <form th:action="@{/manager/farmers/{id}/approve(id=${f.id})}" method="post">
+                                    <button type="submit" class="btn btn-sm btn-primary">Approve</button>
+                                </form>
+                                <form th:action="@{/manager/farmers/{id}/reject(id=${f.id})}" method="post"
+                                      onsubmit="const r = prompt('Reason for rejection:'); if(!r) return false; this.reason.value = r;">
+                                    <input type="hidden" name="reason" value="">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                                </form>
+                            </div>
+                            <span th:unless="${f.approvalStatus.name() == 'PENDING'}" style="color: var(--text-muted); font-size: 0.8125rem;">
+                                Processed
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
