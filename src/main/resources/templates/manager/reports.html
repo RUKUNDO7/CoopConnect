@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Cooperative Reports & CSV Export</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container" style="max-width: 650px;">
+        <div style="margin-bottom: 1.5rem;">
+            <a th:href="@{/manager/dashboard}" style="font-weight: 600;">&larr; Back to Dashboard</a>
+        </div>
+
+        <div class="card" style="box-shadow: var(--shadow-md);">
+            <div class="card-header">
+                <div>
+                    <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--primary-dark);">Export Cooperative Sales Report</h2>
+                    <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.25rem;">
+                        Download wholesale orders, buyer transactions, and produce dispatches as a CSV file (compatible with Excel).
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <form th:action="@{/manager/reports/export}" method="get">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="date" id="startDate" name="startDate" th:value="${startDate}" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="endDate" class="form-label">End Date</label>
+                            <input type="date" id="endDate" name="endDate" th:value="${endDate}" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div style="background-color: var(--bg-main); padding: 1rem; border-radius: var(--radius-md); font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        ℹ️ <strong>Exported Data Columns:</strong> Order Number, Buyer Name, Buyer Phone, Status, Total Amount (RWF), Produce Items Breakdown, Created Timestamp.
+                    </div>
+
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="submit" class="btn btn-primary btn-lg" style="flex: 1;">
+                            📥 Download CSV Spreadsheet
+                        </button>
+                        <a th:href="@{/manager/dashboard}" class="btn btn-outline btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
