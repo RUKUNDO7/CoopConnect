@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Platform Administration</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark);">System Administration</h1>
+                <p style="color: var(--text-secondary);">National platform overview, user management, and security audit logs.</p>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <a th:href="@{/admin/users}" class="btn btn-outline">Manage Users</a>
+                <a th:href="@{/admin/cooperatives}" class="btn btn-outline">Manage Cooperatives</a>
+                <a th:href="@{/admin/audit-logs}" class="btn btn-primary">🔒 Audit Logs</a>
+            </div>
+        </div>
+
+        <div class="metrics-row">
+            <div class="metric-card">
+                <div class="metric-icon-box icon-emerald">👥</div>
+                <div>
+                    <div class="metric-value" th:text="${totalUsers}">0</div>
+                    <div class="metric-title">Registered Users</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon-box icon-amber">🏢</div>
+                <div>
+                    <div class="metric-value" th:text="${totalCoops}">0</div>
+                    <div class="metric-title">Active Cooperatives</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon-box icon-blue">📦</div>
+                <div>
+                    <div class="metric-value" th:text="${totalListings}">0</div>
+                    <div class="metric-title">Published Listings</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon-box icon-emerald">💰</div>
+                <div>
+                    <div class="metric-value" th:text="${#numbers.formatDecimal(totalGmv, 1, 'COMMA', 0, 'POINT')} + ' RWF'">0 RWF</div>
+                    <div class="metric-title">Total Platform GMV</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Platform Orders -->
+        <div class="card">
+            <div class="card-header">
+                <h3 style="font-size: 1.125rem; font-weight: 700;">Platform Transactions & Activity</h3>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <div class="table-responsive" style="border: none; box-shadow: none;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Buyer</th>
+                                <th>Total (RWF)</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(recentOrders)}">
+                                <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                    No platform orders recorded yet.
+                                </td>
+                            </tr>
+                            <tr th:each="o : ${recentOrders}">
+                                <td><strong th:text="${o.orderNumber}">ORD-1234</strong></td>
+                                <td th:text="${o.buyer.fullName}">Buyer</td>
+                                <td><strong style="color: var(--primary);" th:text="${#numbers.formatDecimal(o.totalAmount, 1, 'COMMA', 0, 'POINT')} + ' RWF'">50,000 RWF</strong></td>
+                                <td>
+                                    <span th:if="${o.status.name() == 'PENDING'}" class="status-chip status-pending">PENDING</span>
+                                    <span th:if="${o.status.name() == 'PAID'}" class="status-chip status-paid">PAID</span>
+                                    <span th:if="${o.status.name() == 'DELIVERED'}" class="status-chip status-delivered">DELIVERED</span>
+                                    <span th:if="${o.status.name() == 'CANCELLED'}" class="status-chip status-rejected">CANCELLED</span>
+                                </td>
+                                <td th:text="${#temporals.format(o.createdAt, 'yyyy-MM-dd HH:mm')}">Date</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
