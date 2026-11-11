@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Assigned Deliveries</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <a th:href="@{/transporter/dashboard}" style="font-weight: 600;">&larr; Back to Dashboard</a>
+                <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.5rem;">
+                    All Assigned Deliveries & Transit Updates
+                </h1>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Buyer & Contact</th>
+                        <th>Cooperative Origin</th>
+                        <th>Produce Items</th>
+                        <th>Current Status</th>
+                        <th>Update Transit Status & Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(deliveries)}">
+                        <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                            No deliveries currently assigned.
+                        </td>
+                    </tr>
+                    <tr th:each="d : ${deliveries}">
+                        <td><strong th:text="${d.order.orderNumber}">ORD-1234</strong></td>
+                        <td>
+                            <strong th:text="${d.order.buyer.fullName}">Buyer Name</strong>
+                            <div style="font-size: 0.8125rem; color: var(--text-muted);" th:text="${d.order.buyer.phone}">078XXXXXXX</div>
+                        </td>
+                        <td>
+                            <div th:each="item : ${d.order.items}">
+                                <strong th:text="${item.listing.cooperative.name}">Coop</strong>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);"
+                                     th:text="${item.listing.cooperative.district + ', ' + item.listing.cooperative.sector}">District</div>
+                            </div>
+                        </td>
+                        <td>
+                            <ul style="list-style: none; padding-left: 0; font-size: 0.875rem;">
+                                <li th:each="item : ${d.order.items}">
+                                    <span th:text="${item.listing.title}">Produce</span>
+                                    <span style="color: var(--text-muted);" th:text="${' (' + item.quantity + ' ' + item.listing.unit + ')'}"></span>
+                                </li>
+                            </ul>
+                        </td>
+                        <td>
+                            <span class="status-chip"
+                                  th:classappend="${d.status.name() == 'DELIVERED'} ? 'status-delivered' : (${d.status.name() == 'ASSIGNED'} ? 'status-pending' : 'status-in-transit')"
+                                  th:text="${d.status}">ASSIGNED</span>
+                        </td>
+                        <td>
+                            <form th:action="@{/transporter/deliveries/{id}/update(id=${d.id})}" method="post" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <select name="status" class="form-select" style="font-size: 0.8125rem; padding: 0.35rem 0.5rem;" required>
+                                        <option value="PICKED_UP" th:selected="${d.status.name() == 'PICKED_UP'}">PICKED UP</option>
+                                        <option value="IN_TRANSIT" th:selected="${d.status.name() == 'IN_TRANSIT'}">IN TRANSIT</option>
+                                        <option value="DELIVERED" th:selected="${d.status.name() == 'DELIVERED'}">DELIVERED</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                                </div>
+                                <input type="text" name="notes" class="form-control" placeholder="Transit notes (e.g. En route Kigali)" style="font-size: 0.8125rem; padding: 0.35rem 0.5rem;">
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
