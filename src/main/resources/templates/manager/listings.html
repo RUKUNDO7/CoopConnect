@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Cooperative Produce Listings</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <a th:href="@{/manager/dashboard}" style="font-weight: 600;">&larr; Back to Dashboard</a>
+                <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin-top: 0.5rem;">
+                    Marketplace Produce Listings
+                </h1>
+                <p style="color: var(--text-secondary);" th:text="${cooperative.name}">Cooperative</p>
+            </div>
+            <a th:href="@{/manager/listings/new}" class="btn btn-primary">
+                ➕ Publish New Listing
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Quality Grade</th>
+                        <th>Price (RWF / Unit)</th>
+                        <th>Available Stock</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(listings)}">
+                        <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                            No produce listings published yet. Click "Publish New Listing" to create one from verified harvests.
+                        </td>
+                    </tr>
+                    <tr th:each="l : ${listings}">
+                        <td>
+                            <strong th:text="${l.title}">Kinigi Irish Potatoes</strong>
+                            <div style="font-size: 0.8125rem; color: var(--text-muted);">Farmer: <span th:text="${l.harvest.farmer.fullName}">Farmer</span></div>
+                        </td>
+                        <td><span class="status-chip status-verified" th:text="${l.harvest.qualityGrade}">GRADE_A</span></td>
+                        <td><strong style="color: var(--primary);" th:text="${#numbers.formatDecimal(l.pricePerUnit, 1, 'COMMA', 0, 'POINT')} + ' RWF / ' + ${l.unit}">480 RWF / kg</strong></td>
+                        <td th:text="${#numbers.formatDecimal(l.availableQuantity, 1, 'COMMA', 0, 'POINT')} + ' ' + ${l.unit}">3,200 kg</td>
+                        <td>
+                            <span th:if="${l.active}" class="status-chip status-approved">ACTIVE IN MARKET</span>
+                            <span th:unless="${l.active}" class="status-chip status-rejected">DEACTIVATED / OUT OF STOCK</span>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <a th:href="@{/products/{id}(id=${l.id})}" class="btn btn-sm btn-outline">View in Catalog</a>
+                                <form th:action="@{/manager/listings/{id}/toggle(id=${l.id})}" method="post">
+                                    <button type="submit" class="btn btn-sm" th:classappend="${l.active} ? 'btn-outline-danger' : 'btn-primary'"
+                                            th:text="${l.active} ? 'Deactivate' : 'Activate'"></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
