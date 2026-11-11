@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Publish Produce Listing</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container" style="max-width: 680px;">
+        <div style="margin-bottom: 1.5rem;">
+            <a th:href="@{/manager/listings}" style="font-weight: 600;">&larr; Back to Listings</a>
+        </div>
+
+        <div class="card" style="box-shadow: var(--shadow-md);">
+            <div class="card-header">
+                <div>
+                    <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--primary-dark);">Publish Marketplace Produce Listing</h2>
+                    <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.25rem;">
+                        Convert a verified member harvest into an active wholesale marketplace listing.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <form th:action="@{/manager/listings}" th:object="${listingRequest}" method="post" enctype="multipart/form-data">
+                    
+                    <div class="form-group">
+                        <label for="harvestId" class="form-label">Select Verified Member Harvest</label>
+                        <select id="harvestId" th:field="*{harvestId}" class="form-select" required>
+                            <option value="">-- Choose Harvest --</option>
+                            <option th:each="h : ${verifiedHarvests}" th:value="${h.id}"
+                                    th:text="${h.category.name + ' - ' + h.quantity + ' ' + h.unit + ' (Farmer: ' + h.farmer.fullName + ', ' + h.qualityGrade + ')'}">
+                            </option>
+                        </select>
+                        <div class="form-error" th:if="${#fields.hasErrors('harvestId')}" th:errors="*{harvestId}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="title" class="form-label">Marketplace Listing Title</label>
+                        <input type="text" id="title" th:field="*{title}" class="form-control"
+                               placeholder="e.g. Kinigi High-Grade Irish Potatoes (Grade A)" required>
+                        <div class="form-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="pricePerUnit" class="form-label">Price per Unit (RWF)</label>
+                            <input type="number" id="pricePerUnit" th:field="*{pricePerUnit}" class="form-control"
+                                   placeholder="e.g. 480" min="1" step="1" required>
+                            <div class="form-error" th:if="${#fields.hasErrors('pricePerUnit')}" th:errors="*{pricePerUnit}"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="availableQuantity" class="form-label">Available Wholesale Quantity</label>
+                            <input type="number" id="availableQuantity" th:field="*{availableQuantity}" class="form-control"
+                                   placeholder="e.g. 3000" min="0.01" step="0.01" required>
+                            <div class="form-error" th:if="${#fields.hasErrors('availableQuantity')}" th:errors="*{availableQuantity}"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="unit" class="form-label">Unit of Sale</label>
+                        <select id="unit" th:field="*{unit}" class="form-select" required>
+                            <option value="kg">Kilograms (kg)</option>
+                            <option value="ton">Metric Tons</option>
+                            <option value="bags (50kg)">Bags (50kg)</option>
+                            <option value="bunches">Bunches</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="photo" class="form-label">Produce Photo (Optional)</label>
+                        <input type="file" id="photo" name="photo" class="form-control" accept="image/jpeg,image/png,image/webp">
+                        <span class="form-text">Supported formats: JPG, PNG, WEBP. Max size: 5MB.</span>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                        <button type="submit" class="btn btn-primary btn-lg" style="flex: 1;">
+                            🚀 Publish to Marketplace
+                        </button>
+                        <a th:href="@{/manager/listings}" class="btn btn-outline btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
